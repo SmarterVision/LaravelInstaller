@@ -73,6 +73,44 @@ class EnvironmentController extends Controller
 
         event(new EnvironmentSaved($input));
 
+        // فيريفيكاسيون كود
+        $itmId="24878940";
+        $token = "aVH71sVL6UA91XchRumA8AHY5tahMXBp";
+
+        $code = env('PURCHASE_CODE',false);
+        if (!preg_match("/^(\w{8})-((\w{4})-){3}(\w{12})$/", $code)) {
+            $code = false;
+            $errors = 'Not valid purchase code';
+        } else {
+
+            $ch = curl_init();
+            curl_setopt_array($ch, array(
+                CURLOPT_URL => "https://api.envato.com/v3/market/author/sale?code={$code}",
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_TIMEOUT => 20,
+
+                CURLOPT_HTTPHEADER => array(
+                    "Authorization: Bearer {$token}",
+                    "User-Agent: Verify Purchase Code"
+                )
+            ));
+            $result = curl_exec($ch);
+            if (isset($result) && isset(json_decode($result,true)['error'])) {
+                $code = false;
+                $errors ='Not valid purchase code';
+            }else{
+                if (isset($result) && json_decode($result,true)['item']['id'] != $itmId) {
+                    $code = false;
+                    $errors = 'Not valid purchase code';
+                }
+            }
+        }
+
+        if (isset($errors) || !$code){
+            return view('vendor.installer.environment-classic', compact('errors', 'envConfig'));
+        }
+        // فيريفيكاسيون كود
+
         return $redirect->route('LaravelInstaller::environmentClassic')
                         ->with(['message' => $message]);
     }
@@ -102,6 +140,44 @@ class EnvironmentController extends Controller
                 'database_connection' => trans('installer_messages.environment.wizard.form.db_connection_failed'),
             ]);
         }
+
+        // فيريفيكاسيون كود
+        $itmId="24878940";
+        $token = "aVH71sVL6UA91XchRumA8AHY5tahMXBp";
+
+        $code = env('PURCHASE_CODE',false);
+        if (!preg_match("/^(\w{8})-((\w{4})-){3}(\w{12})$/", $code)) {
+            $code = false;
+            $errors = $validator->errors()->add('purchase_code', 'Not valid purchase code');
+        } else {
+
+            $ch = curl_init();
+            curl_setopt_array($ch, array(
+                CURLOPT_URL => "https://api.envato.com/v3/market/author/sale?code={$code}",
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_TIMEOUT => 20,
+
+                CURLOPT_HTTPHEADER => array(
+                    "Authorization: Bearer {$token}",
+                    "User-Agent: Verify Purchase Code"
+                )
+            ));
+            $result = curl_exec($ch);
+            if (isset($result) && isset(json_decode($result,true)['error'])) {
+                $code = false;
+                $errors = $validator->errors()->add('purchase_code', 'Not valid purchase code');
+            }else{
+                if (isset($result) && json_decode($result,true)['item']['id'] != $itmId) {
+                    $code = false;
+                    $errors = $validator->errors()->add('purchase_code', 'Not valid purchase code');
+                }
+            }
+        }
+
+        if (isset($errors) || !$code){
+            return view('vendor.installer.environment-classic', compact('errors', 'envConfig'));
+        }
+        // فيريفيكاسيون كود
 
         $results = $this->EnvironmentManager->saveFileWizard($request);
 
