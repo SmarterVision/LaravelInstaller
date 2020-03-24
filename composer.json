@@ -23,7 +23,7 @@
     },
     "autoload": {
         "psr-4": {
-            "SmarterVision\\LaravelInstaller\\": "src/"
+            "RachidLaasri\\LaravelInstaller\\": "src/"
         },
         "files": [
             "src/Helpers/functions.php"
@@ -32,7 +32,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "SmarterVision\\LaravelInstaller\\Providers\\LaravelInstallerServiceProvider"
+                "RachidLaasri\\LaravelInstaller\\Providers\\LaravelInstallerServiceProvider"
             ]
         }
     },
