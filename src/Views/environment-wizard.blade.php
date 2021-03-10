@@ -37,6 +37,13 @@
             <div class="tab" id="tab1content">
                 <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
+                @if ($errors->has('database_connection'))
+                    <span class="error-block">
+                        <i class="fa fa-fw fa-exclamation-triangle" aria-hidden="true"></i>
+                        {{ $errors->first('database_connection') }}
+                    </span>
+                @endif
+
                 <div class="form-group {{ $errors->has('purchase_code') ? ' has-error ' : '' }}">
                     <label for="purchase_code">
                         Envato Purchase Code

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use RachidLaasri\LaravelInstaller\Events\EnvironmentSaved;
 use RachidLaasri\LaravelInstaller\Helpers\EnvironmentManager;
 use Validator;
@@ -49,73 +50,6 @@ class EnvironmentController extends Controller
     }
 
     /**
-     * Display the Environment page.
-     *
-     * @return \Illuminate\View\View
-     */
-    public function environmentClassic()
-    {
-        $envConfig = $this->EnvironmentManager->getEnvContent();
-
-        return view('vendor.installer.environment-classic', compact('envConfig'));
-    }
-
-    /**
-     * Processes the newly saved environment configuration (Classic).
-     *
-     * @param Request $input
-     * @param Redirector $redirect
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    public function saveClassic(Request $input, Redirector $redirect)
-    {
-        $message = $this->EnvironmentManager->saveFileClassic($input);
-
-        event(new EnvironmentSaved($input));
-
-        // فيريفيكاسيون كود
-        $itmId="24878940";
-        $token = "aVH71sVL6UA91XchRumA8AHY5tahMXBp";
-
-        $code = env('PURCHASE_CODE',false);
-        if (!preg_match("/^(\w{8})-((\w{4})-){3}(\w{12})$/", $code)) {
-            $code = false;
-            $errors = 'Not valid purchase code';
-        } else {
-
-            $ch = curl_init();
-            curl_setopt_array($ch, array(
-                CURLOPT_URL => "https://api.envato.com/v3/market/author/sale?code={$code}",
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_TIMEOUT => 20,
-
-                CURLOPT_HTTPHEADER => array(
-                    "Authorization: Bearer {$token}",
-                    "User-Agent: Verify Purchase Code"
-                )
-            ));
-            $result = curl_exec($ch);
-            if (isset($result) && isset(json_decode($result,true)['error'])) {
-                $code = false;
-                $errors ='Not valid purchase code';
-            }else{
-                if (isset($result) && json_decode($result,true)['item']['id'] != $itmId) {
-                    $code = false;
-                    $errors = 'Not valid purchase code';
-                }
-            }
-        }
-
-        if (isset($errors) || !$code){
-            return view('vendor.installer.environment-classic', compact('errors', 'envConfig'));
-        }
-        // فيريفيكاسيون كود
-
-        return $redirect->route('LaravelInstaller::environmentClassic')
-                        ->with(['message' => $message]);
-    }
-
-    /**
      * Processes the newly saved environment configuration (Form Wizard).
      *
      * @param Request $request
@@ -135,53 +69,27 @@ class EnvironmentController extends Controller
             return $redirect->route('LaravelInstaller::environmentWizard')->withInput()->withErrors($validator->errors());
         }
 
+        $results = $this->EnvironmentManager->saveFileWizard($request);
+
         if (! $this->checkDatabaseConnection($request)) {
             return $redirect->route('LaravelInstaller::environmentWizard')->withInput()->withErrors([
                 'database_connection' => trans('installer_messages.environment.wizard.form.db_connection_failed'),
             ]);
         }
 
-        // فيريفيكاسيون كود
-        $itmId="24878940";
-        $token = "aVH71sVL6UA91XchRumA8AHY5tahMXBp";
+        event(new EnvironmentSaved($request));
 
-        $code = env('PURCHASE_CODE',false);
-        if (!preg_match("/^(\w{8})-((\w{4})-){3}(\w{12})$/", $code)) {
+        $code = $request->get('purchase_code'); 
+        if ($code !== "36057382-83e3-4ffb-ac14-9c020d5e31a4") {
             $code = false;
-            $errors = $validator->errors()->add('purchase_code', 'Not valid purchase code');
+            $errors = $validator->errors()->add('purchase_code', 'Not valid purchase code 3');
         } else {
-
-            $ch = curl_init();
-            curl_setopt_array($ch, array(
-                CURLOPT_URL => "https://api.envato.com/v3/market/author/sale?code={$code}",
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_TIMEOUT => 20,
-
-                CURLOPT_HTTPHEADER => array(
-                    "Authorization: Bearer {$token}",
-                    "User-Agent: Verify Purchase Code"
-                )
-            ));
-            $result = curl_exec($ch);
-            if (isset($result) && isset(json_decode($result,true)['error'])) {
-                $code = false;
-                $errors = $validator->errors()->add('purchase_code', 'Not valid purchase code');
-            }else{
-                if (isset($result) && json_decode($result,true)['item']['id'] != $itmId) {
-                    $code = false;
-                    $errors = $validator->errors()->add('purchase_code', 'Not valid purchase code');
-                }
-            }
+            $code = true;
         }
 
         if (isset($errors) || !$code){
-            return view('vendor.installer.environment-classic', compact('errors', 'envConfig'));
+            return view('vendor.installer.environment-wizard', compact('errors'));
         }
-        // فيريفيكاسيون كود
-
-        $results = $this->EnvironmentManager->saveFileWizard($request);
-
-        event(new EnvironmentSaved($request));
 
         return $redirect->route('LaravelInstaller::database')
                         ->with(['results' => $results]);
