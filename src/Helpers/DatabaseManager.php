@@ -43,7 +43,7 @@ class DatabaseManager
             return $this->response($e->getMessage(), 'error', $outputLog);
         }
 
-        return $this->seed($outputLog);
+        return $this->seed($version, $outputLog);
     }
 
     /**
@@ -52,10 +52,14 @@ class DatabaseManager
      * @param \Symfony\Component\Console\Output\BufferedOutput $outputLog
      * @return array
      */
-    private function seed(BufferedOutput $outputLog)
+    private function seed($version, BufferedOutput $outputLog)
     {
         try {
-            Artisan::call('db:seed', ['--force' => true], $outputLog);
+            if($version != null) {
+                Artisan::call('db:seed', ['--class'=>"Update".$version."Seeder", '--force' => true], $outputLog);
+            }else{
+                Artisan::call('db:seed', ['--force' => true], $outputLog);
+            }
         } catch (Exception $e) {
             return $this->response($e->getMessage(), 'error', $outputLog);
         }

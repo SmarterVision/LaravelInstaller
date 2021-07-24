@@ -80,7 +80,7 @@ class EnvironmentController extends Controller
         event(new EnvironmentSaved($request));
 
         $code = $request->get('purchase_code'); 
-        if ($code !== "36057382-83e3-4ffb-ac14-9c020d5e31a4") {
+        if ($code !== "c8174e80-b752-4147-9536-0d0cb210ebfe") {
             $code = false;
             $errors = $validator->errors()->add('purchase_code', 'Not valid purchase code 3');
         } else {
