@@ -33,7 +33,7 @@
             </li>
             <li class="step__divider"></li>
             <li class="step__item {{ isActive('LaravelUpdater::welcome') }}">
-                <i class="step__icon fa fa-refresh" aria-hidden="true"></i>
+                <i class="step__icon fa fa-redo-alt" aria-hidden="true"></i>
             </li>
             <li class="step__divider"></li>
         </ul>
