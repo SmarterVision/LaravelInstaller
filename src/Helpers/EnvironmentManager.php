@@ -112,17 +112,20 @@ class EnvironmentManager
         'DB_PASSWORD=\'' . $request->database_password . "'\n\n" .
         'BROADCAST_DRIVER=log' . "\n" .
         'CACHE_DRIVER=file' . "\n" .
-        'QUEUE_CONNECTION=sync' . "\n" .
+        'QUEUE_DRIVER=sync' . "\n" .
         'SESSION_DRIVER=file' . "\n\n" .
-        'REDIS_HOST=' . $request->redis_hostname . "\n" .
-        'REDIS_PASSWORD=' . $request->redis_password . "\n" .
-        'REDIS_PORT=' . $request->redis_port . "\n\n" .
-        'MAIL_DRIVER=' . $request->mail_driver . "\n" .
-        'MAIL_HOST=' . $request->mail_host . "\n" .
-        'MAIL_PORT=' . $request->mail_port . "\n" .
-        'MAIL_USERNAME=' . $request->mail_username . "\n" .
-        'MAIL_PASSWORD=' . $request->mail_password . "\n" .
-        'MAIL_ENCRYPTION=' . $request->mail_encryption . "\n\n";
+        'REDIS_HOST=127.0.0.1' . "\n" .
+        'REDIS_PASSWORD=null' . "\n" .
+        'REDIS_PORT=6379' . "\n\n" .
+        'MAIL_DRIVER=smtp' . "\n" .
+        'MAIL_HOST=smtp.mailtrap.io' . "\n" .
+        'MAIL_PORT=2525' . "\n" .
+        'MAIL_USERNAME=null' . $request->mail_username . "\n" .
+        'MAIL_PASSWORD=null' . $request->mail_password . "\n" .
+        'MAIL_ENCRYPTION=null' . $request->mail_encryption . "\n\n" .
+        'PUSHER_APP_ID=' . "\n" .
+        'PUSHER_APP_KEY=' . "\n" .
+        'PUSHER_APP_SECRET=' . "\n\n";
 
         try {
             file_put_contents($this->envPath, $envFileData);
