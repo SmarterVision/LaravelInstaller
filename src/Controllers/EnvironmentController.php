@@ -72,9 +72,8 @@ class EnvironmentController extends Controller
         $results = $this->EnvironmentManager->saveFileWizard($request);
 
         if (!$this->checkDatabaseConnection($request)) {
-            return $redirect->route('LaravelInstaller::environmentWizard')->withInput()->withErrors([
-                'database_connection' => trans('installer_messages.environment.wizard.form.db_connection_failed'),
-            ]);
+            $errors = $validator->errors()->add('database_connection', trans('installer_messages.environment.wizard.form.db_connection_failed'));
+            return view('vendor.installer.environment-wizard', compact('errors'));
         }
 
 
@@ -144,14 +143,16 @@ class EnvironmentController extends Controller
                         'host' => $request->input('database_hostname'),
                         'port' => $request->input('database_port'),
                         'database' => $request->input('database_name'),
-                        'username' => $request->input('database_username'),
-                        'password' => $request->input('database_password'),
+                        'username' => $request->input('database_username', ''),
+                        'password' => $request->input('database_password', ''),
                     ]),
                 ],
             ],
         ]);
 
         try {
+            DB::purge($connection);
+            DB::reconnect();
             DB::connection()->getPdo();
 
             return true;
