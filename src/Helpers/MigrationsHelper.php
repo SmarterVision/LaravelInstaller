@@ -2,6 +2,7 @@
 
 namespace RachidLaasri\LaravelInstaller\Helpers;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\DB;
 
 trait MigrationsHelper
@@ -11,10 +12,13 @@ trait MigrationsHelper
      *
      * @return array Array of migrations name, empty if no migrations are existing
      */
-    public function getMigrations()
+    public function getMigrations($version)
     {
-        $migrations = glob(database_path().DIRECTORY_SEPARATOR.'migrations'.DIRECTORY_SEPARATOR.'*.php');
-
+        $migrations = glob(database_path().DIRECTORY_SEPARATOR.'migrations'.DIRECTORY_SEPARATOR.$version.DIRECTORY_SEPARATOR.'*.php');
+        $migrations = array_map(function($element)
+        {
+            return Arr::last(explode(DIRECTORY_SEPARATOR,$element));
+        },$migrations);
         return str_replace('.php', '', $migrations);
     }
 

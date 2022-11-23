@@ -16,13 +16,8 @@
             <li class="list__item list__title {{ $phpSupportInfo['supported'] ? 'success' : 'error' }}">
                 <strong>{{ ucfirst($type) }}</strong>
                 @if($type == 'php')
-                    <strong>
-                        <small>
-                            (version {{ $phpSupportInfo['minimum'] }} required)
-                        </small>
-                    </strong>
-                    <span class="float-right">
-                        <strong>
+                    <strong> <small> (version {{ $phpSupportInfo['minimum'] }} required) </small> </strong>
+                    <span class="float-right"> <strong>
                             {{ $phpSupportInfo['current'] }}
                         </strong>
                         <i class="fa fa-fw fa-{{ $phpSupportInfo['supported'] ? 'check-circle-o' : 'exclamation-circle' }} row-icon" aria-hidden="true"></i>
@@ -42,8 +37,7 @@
         <div class="buttons">
             <a class="button" href="{{ route('LaravelInstaller::permissions') }}">
                 {{ trans('installer_messages.requirements.next') }}
-                <i class="fa fa-angle-right fa-fw" aria-hidden="true"></i>
-            </a>
+                <i class="fa fa-angle-right fa-fw" aria-hidden="true"></i> </a>
         </div>
     @endif
 
